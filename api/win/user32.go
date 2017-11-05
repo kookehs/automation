@@ -31,12 +31,12 @@ func init() {
 }
 
 func EnumWindows(lpEnumFunc WNDENUMPROC, lParam LPARAM) BOOL {
-	ret, _, _ := enumWindows.Call(lpEnumFunc, lParam)
+	ret, _, _ := enumWindows.Call(lpEnumFunc, uintptr(lParam))
 	return BOOL(ret)
 }
 
 func GetWindowThreadProcessId(hWnd HWND, lpdwProcessId LPDWORD) DWORD {
-	ret, _, _ := getWindowThreadProcessId.Call(hWnd, uintptr(unsafe.Pointer(&lpdwProcessId)))
+	ret, _, _ := getWindowThreadProcessId.Call(hWnd, uintptr(unsafe.Pointer(lpdwProcessId)))
 	return DWORD(ret)
 }
 

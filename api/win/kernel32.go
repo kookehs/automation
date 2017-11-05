@@ -40,13 +40,13 @@ type (
 	HANDLE    = uintptr
 	HINSTANCE = HANDLE
 	HMODULE   = HINSTANCE
-	LPARAM    = uintptr
-	LPVOID    = uintptr
-	LPCVOID   = uintptr
-	LPDWORD   = uintptr
+	LPARAM    = int64
+	LPVOID    = unsafe.Pointer
+	LPCVOID   = unsafe.Pointer
+	LPDWORD   = *DWORD
 	LPTSTR    = LPWSTR
 	LPWSTR    = *WCHAR
-	SIZE_T    = uint64
+	SIZE_T    = int64
 	WCHAR     = []byte
 )
 
@@ -81,6 +81,6 @@ func OpenProcess(dwDesiredAccess DWORD, bInheritHandle BOOL, dwProcessId DWORD) 
 }
 
 func ReadProcessMemory(hProcess HANDLE, lpBaseAddress LPCVOID, lpBuffer LPVOID, nSize SIZE_T, lpNumberOfBytesRead *SIZE_T) BOOL {
-	ret, _, _ := readProcessMemory.Call(hProcess, lpBaseAddress, lpBuffer, uintptr(nSize), uintptr(unsafe.Pointer(lpNumberOfBytesRead)))
+	ret, _, _ := readProcessMemory.Call(hProcess, uintptr(lpBaseAddress), uintptr(lpBuffer), uintptr(nSize), uintptr(unsafe.Pointer(lpNumberOfBytesRead)))
 	return BOOL(ret)
 }

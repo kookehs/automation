@@ -5,7 +5,21 @@ import (
 	"github.com/kookehs/automation/api/win"
 	"os"
 	"strconv"
+	"syscall"
 )
+
+type Process struct {
+	FileName []byte
+	Handle   win.HANDLE
+	HWnd     win.HWND
+	Pid      win.DWORD
+}
+
+func NewProcess() *Process {
+	return &Process{
+		FileName: make([]byte, win.MAX_PATH),
+	}
+}
 
 func main() {
 	if len(os.Args) != 2 {
@@ -13,27 +27,56 @@ func main() {
 		return
 	}
 
-	var pid win.DWORD
+	var minesweeper *Process = NewProcess()
 
-	if id, err := strconv.ParseUint(os.Args[1], 10, 32); err != nil {
+	if pid, err := strconv.ParseUint(os.Args[1], 10, 32); err != nil {
 		fmt.Println(err)
 		return
 	} else {
-		pid = win.DWORD(id)
+		minesweeper.Pid = win.DWORD(pid)
 	}
 
 	var access win.DWORD = win.PROCESS_VM_READ | win.PROCESS_QUERY_INFORMATION
 	var inherit win.BOOL = 0
-	handle := win.OpenProcess(access, inherit, pid)
+	minesweeper.Handle = win.OpenProcess(access, inherit, minesweeper.Pid)
 
-	if handle == win.NULL {
+	if minesweeper.Handle == win.NULL {
 		return
 	}
 
-	defer win.CloseHandle(handle)
-	fmt.Println("handle: ", handle)
+	defer win.CloseHandle(minesweeper.Handle)
+	fmt.Println("handle: ", minesweeper.Handle)
 
-	fileName := make([]byte, win.MAX_PATH)
-	win.GetModuleFileNameEx(handle, 0, &fileName, win.MAX_PATH)
-	fmt.Println("file name: ", string(fileName))
+	if win.GetModuleFileNameEx(minesweeper.Handle, 0, &minesweeper.FileName, win.MAX_PATH) != 0 {
+		fmt.Println("file name: ", string(minesweeper.FileName))
+	}
+
+	var address uintptr = 0x010057A4
+	var discovered [4]byte
+	var read win.SIZE_T
+
+	if win.ReadProcessMemory(minesweeper.Handle, win.LPCVOID(address), win.LPVOID(&discovered), 4, &read) != 0 {
+		fmt.Println("read: ", read)
+		fmt.Println("discovered: ", discovered)
+	}
+
+	callback := syscall.NewCallback(func(hWnd win.HWND, lParam win.LPARAM) win.BOOL {
+		var pid win.DWORD
+		win.GetWindowThreadProcessId(hWnd, &pid)
+
+		if uintptr(pid) == uintptr(lParam) {
+			minesweeper.HWnd = hWnd
+			return 0
+		}
+
+		return 1
+	})
+
+	if win.EnumWindows(callback, win.LPARAM(minesweeper.Pid)) != 0 {
+		fmt.Println("hWnd: ", minesweeper.HWnd)
+	}
+
+	if win.SetForegroundWindow(minesweeper.HWnd) != 0 {
+		fmt.Println("foreground: ", minesweeper.HWnd)
+	}
 }
