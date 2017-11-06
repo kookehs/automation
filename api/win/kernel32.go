@@ -40,14 +40,23 @@ type (
 	HANDLE    = uintptr
 	HINSTANCE = HANDLE
 	HMODULE   = HINSTANCE
-	LPARAM    = int64
+	LONG      = int32
+	LONG_PTR  = int64
+	LPARAM    = LONG_PTR
 	LPVOID    = unsafe.Pointer
 	LPCVOID   = unsafe.Pointer
 	LPDWORD   = *DWORD
 	LPTSTR    = LPWSTR
 	LPWSTR    = *WCHAR
+	LRESULT   = LONG_PTR
+	SHORT     = int16
 	SIZE_T    = int64
+	UINT      = uint32
+	UINT_PTR  = uintptr
+	ULONG_PTR = uintptr
 	WCHAR     = []byte
+	WORD      = uint16
+	WPARAM    = UINT_PTR
 )
 
 var (
