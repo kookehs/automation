@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"syscall"
+	"unsafe"
 )
 
 type Process struct {
@@ -79,4 +80,29 @@ func main() {
 	if win.SetForegroundWindow(minesweeper.HWnd) != 0 {
 		fmt.Println("foreground: ", minesweeper.HWnd)
 	}
+
+	// TODO: Fix issue with absolute positioning
+	var size win.UINT = 1
+	inputs := make([]win.MOUSE_INPUT, size)
+
+	input := win.MOUSE_INPUT{
+		Type: win.INPUT_MOUSE,
+		Mi: win.MOUSEINPUT{
+			Dx:          480,
+			Dy:          10,
+			MouseData:   0,
+			DwFlags:     win.MOUSEEVENTF_ABSOLUTE | win.MOUSEEVENTF_MOVE,
+			Time:        0,
+			DwExtraInfo: 0,
+		},
+	}
+
+	inputs[0] = input
+	win.SendInput(size, unsafe.Pointer(&inputs[0]), int(unsafe.Sizeof(win.MOUSE_INPUT{})))
+
+	inputs[0].Mi.DwFlags = win.MOUSEEVENTF_ABSOLUTE | win.MOUSEEVENTF_LEFTDOWN
+	win.SendInput(size, unsafe.Pointer(&inputs[0]), int(unsafe.Sizeof(win.MOUSE_INPUT{})))
+
+	inputs[0].Mi.DwFlags = win.MOUSEEVENTF_ABSOLUTE | win.MOUSEEVENTF_LEFTUP
+	win.SendInput(size, unsafe.Pointer(&inputs[0]), int(unsafe.Sizeof(win.MOUSE_INPUT{})))
 }
