@@ -96,7 +96,7 @@ func SendMessage(hWnd HWND, msg UINT, wParam WPARAM, lParam LPARAM) LRESULT {
 	return LRESULT(ret)
 }
 
-func SetCursorPos(x, y int) BOOL {
+func SetCursorPos(x, y int32) BOOL {
 	ret, _, _ := setCursorPos.Call(uintptr(x), uintptr(y))
 	return BOOL(ret)
 }

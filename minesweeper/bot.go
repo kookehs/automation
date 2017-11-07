@@ -9,6 +9,12 @@ import (
 	"unsafe"
 )
 
+const (
+	MOUSE_CLICK_LEFT   = win.MOUSEEVENTF_LEFTDOWN | win.MOUSEEVENTF_LEFTUP
+	MOUSE_CLICK_MIDDLE = win.MOUSEEVENTF_MIDDLEDOWN | win.MOUSEEVENTF_MIDDLEUP
+	MOUSE_CLICK_RIGHT  = win.MOUSEEVENTF_RIGHTDOWN | win.MOUSEEVENTF_RIGHTUP
+)
+
 type Process struct {
 	FileName []byte
 	Handle   win.HANDLE
@@ -81,28 +87,26 @@ func main() {
 		fmt.Println("foreground: ", minesweeper.HWnd)
 	}
 
-	// TODO: Fix issue with absolute positioning
-	var size win.UINT = 1
-	inputs := make([]win.MOUSE_INPUT, size)
+	mouseClick(MOUSE_CLICK_LEFT, 380, 10, 1)
+}
 
-	input := win.MOUSE_INPUT{
-		Type: win.INPUT_MOUSE,
-		Mi: win.MOUSEINPUT{
-			Dx:          480,
-			Dy:          10,
-			MouseData:   0,
-			DwFlags:     win.MOUSEEVENTF_ABSOLUTE | win.MOUSEEVENTF_MOVE,
-			Time:        0,
-			DwExtraInfo: 0,
-		},
+func mouseClick(button win.DWORD, x, y int32, clicks win.UINT) {
+	inputs := make([]win.MOUSE_INPUT, clicks)
+
+	for i := 0; i < int(clicks); i++ {
+		inputs[i] = win.MOUSE_INPUT{
+			Type: win.INPUT_MOUSE,
+			Mi: win.MOUSEINPUT{
+				Dx:          0,
+				Dy:          0,
+				MouseData:   0,
+				DwFlags:     button,
+				Time:        0,
+				DwExtraInfo: 0,
+			},
+		}
 	}
 
-	inputs[0] = input
-	win.SendInput(size, unsafe.Pointer(&inputs[0]), int(unsafe.Sizeof(win.MOUSE_INPUT{})))
-
-	inputs[0].Mi.DwFlags = win.MOUSEEVENTF_ABSOLUTE | win.MOUSEEVENTF_LEFTDOWN
-	win.SendInput(size, unsafe.Pointer(&inputs[0]), int(unsafe.Sizeof(win.MOUSE_INPUT{})))
-
-	inputs[0].Mi.DwFlags = win.MOUSEEVENTF_ABSOLUTE | win.MOUSEEVENTF_LEFTUP
-	win.SendInput(size, unsafe.Pointer(&inputs[0]), int(unsafe.Sizeof(win.MOUSE_INPUT{})))
+	win.SetCursorPos(x, y)
+	win.SendInput(clicks, unsafe.Pointer(&inputs[0]), int(unsafe.Sizeof(win.MOUSE_INPUT{})))
 }
