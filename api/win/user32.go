@@ -33,6 +33,7 @@ const (
 type (
 	HWND        = HANDLE
 	LPINPUT     = unsafe.Pointer
+	LPRECT      = *RECT
 	WNDENUMPROC = uintptr
 )
 
@@ -50,12 +51,21 @@ type MOUSEINPUT struct {
 	DwExtraInfo ULONG_PTR
 }
 
+type RECT struct {
+	Left   LONG
+	Top    LONG
+	Right  LONG
+	Bottom LONG
+}
+
 var (
 	// DLL
 	user32 *windows.DLL
 
 	// Functions
 	enumWindows              *windows.Proc
+	getDesktopWindow         *windows.Proc
+	getWindowRect            *windows.Proc
 	getWindowThreadProcessId *windows.Proc
 	sendInput                *windows.Proc
 	sendMessage              *windows.Proc
@@ -69,6 +79,8 @@ func init() {
 
 	// Functions
 	enumWindows = user32.MustFindProc("EnumWindows")
+	getDesktopWindow = user32.MustFindProc("GetDesktopWindow")
+	getWindowRect = user32.MustFindProc("GetWindowRect")
 	getWindowThreadProcessId = user32.MustFindProc("GetWindowThreadProcessId")
 	sendInput = user32.MustFindProc("SendInput")
 	sendMessage = user32.MustFindProc("SendMessageW")
@@ -78,6 +90,16 @@ func init() {
 
 func EnumWindows(lpEnumFunc WNDENUMPROC, lParam LPARAM) BOOL {
 	ret, _, _ := enumWindows.Call(lpEnumFunc, uintptr(lParam))
+	return BOOL(ret)
+}
+
+func GetDesktopWindow() HWND {
+	ret, _, _ := getDesktopWindow.Call()
+	return ret
+}
+
+func GetWindowRect(hWnd HWND, lpRect LPRECT) BOOL {
+	ret, _, _ := getWindowRect.Call(hWnd, uintptr(unsafe.Pointer(lpRect)))
 	return BOOL(ret)
 }
 
