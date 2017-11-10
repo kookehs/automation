@@ -57,15 +57,6 @@ func main() {
 		fmt.Println("file name: ", string(minesweeper.FileName))
 	}
 
-	var address uintptr = 0x010057A4
-	var discovered [4]byte
-	var read win.SIZE_T
-
-	if win.ReadProcessMemory(minesweeper.Handle, win.LPCVOID(address), win.LPVOID(&discovered), 4, &read) != 0 {
-		fmt.Println("read: ", read)
-		fmt.Println("discovered: ", discovered)
-	}
-
 	callback := syscall.NewCallback(func(hWnd win.HWND, lParam win.LPARAM) win.BOOL {
 		var pid win.DWORD
 		win.GetWindowThreadProcessId(hWnd, &pid)
@@ -87,4 +78,7 @@ func main() {
 	}
 
 	mouseClick(MOUSE_CLICK_LEFT, 380, 10, 1)
+
+	game := NewGame(minesweeper.Handle)
+	fmt.Println(game)
 }
