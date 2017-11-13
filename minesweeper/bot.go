@@ -3,15 +3,11 @@ package main
 import (
 	"fmt"
 	"github.com/kookehs/automation/api/win"
+	"math/rand"
 	"os"
 	"strconv"
 	"syscall"
-)
-
-const (
-	MOUSE_CLICK_LEFT   = win.MOUSEEVENTF_LEFTDOWN | win.MOUSEEVENTF_LEFTUP
-	MOUSE_CLICK_MIDDLE = win.MOUSEEVENTF_MIDDLEDOWN | win.MOUSEEVENTF_MIDDLEUP
-	MOUSE_CLICK_RIGHT  = win.MOUSEEVENTF_RIGHTDOWN | win.MOUSEEVENTF_RIGHTUP
+	"time"
 )
 
 type Process struct {
@@ -19,12 +15,39 @@ type Process struct {
 	Handle   win.HANDLE
 	HWnd     win.HWND
 	Pid      win.DWORD
+	Rect     win.RECT
 }
 
-func NewProcess() *Process {
-	return &Process{
-		FileName: make([]byte, win.MAX_PATH),
+func NewProcess(pid win.DWORD) *Process {
+	process := new(Process)
+	process.FileName = make([]byte, win.MAX_PATH)
+	process.Pid = pid
+
+	var access win.DWORD = win.PROCESS_VM_READ | win.PROCESS_QUERY_INFORMATION
+	var inherit win.BOOL = 0
+	process.Handle = win.OpenProcess(access, inherit, process.Pid)
+
+	if process.Handle == win.NULL {
+		return nil
 	}
+
+	win.GetModuleFileNameEx(process.Handle, 0, &process.FileName, win.MAX_PATH)
+
+	callback := syscall.NewCallback(func(hWnd win.HWND, lParam win.LPARAM) win.BOOL {
+		var pid win.DWORD
+		win.GetWindowThreadProcessId(hWnd, &pid)
+
+		if uintptr(pid) == uintptr(lParam) {
+			process.HWnd = hWnd
+			return 0
+		}
+
+		return 1
+	})
+
+	win.EnumWindows(callback, win.LPARAM(process.Pid))
+	win.GetWindowRect(process.HWnd, &process.Rect)
+	return process
 }
 
 func main() {
@@ -33,52 +56,23 @@ func main() {
 		return
 	}
 
-	var minesweeper *Process = NewProcess()
+	var minesweeper *Process
 
 	if pid, err := strconv.ParseUint(os.Args[1], 10, 32); err != nil {
 		fmt.Println(err)
 		return
 	} else {
-		minesweeper.Pid = win.DWORD(pid)
-	}
-
-	var access win.DWORD = win.PROCESS_VM_READ | win.PROCESS_QUERY_INFORMATION
-	var inherit win.BOOL = 0
-	minesweeper.Handle = win.OpenProcess(access, inherit, minesweeper.Pid)
-
-	if minesweeper.Handle == win.NULL {
-		return
+		minesweeper = NewProcess(win.DWORD(pid))
 	}
 
 	defer win.CloseHandle(minesweeper.Handle)
-	fmt.Println("handle: ", minesweeper.Handle)
-
-	if win.GetModuleFileNameEx(minesweeper.Handle, 0, &minesweeper.FileName, win.MAX_PATH) != 0 {
-		fmt.Println("file name: ", string(minesweeper.FileName))
-	}
-
-	callback := syscall.NewCallback(func(hWnd win.HWND, lParam win.LPARAM) win.BOOL {
-		var pid win.DWORD
-		win.GetWindowThreadProcessId(hWnd, &pid)
-
-		if uintptr(pid) == uintptr(lParam) {
-			minesweeper.HWnd = hWnd
-			return 0
-		}
-
-		return 1
-	})
-
-	if win.EnumWindows(callback, win.LPARAM(minesweeper.Pid)) != 0 {
-		fmt.Println("hWnd: ", minesweeper.HWnd)
-	}
-
-	if win.SetForegroundWindow(minesweeper.HWnd) != 0 {
-		fmt.Println("foreground: ", minesweeper.HWnd)
-	}
-
-	mouseClick(MOUSE_CLICK_LEFT, 380, 10, 1)
+	fmt.Println(minesweeper)
 
 	game := NewGame(minesweeper.Handle)
 	fmt.Println(game)
+
+	rand.Seed(time.Now().UTC().UnixNano())
+
+	win.SetForegroundWindow(minesweeper.HWnd)
+	RandomClick(game, minesweeper)
 }

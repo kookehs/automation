@@ -6,6 +6,12 @@ import (
 )
 
 const (
+	OFFSETX  uint8 = 16
+	OFFSETY  uint8 = 102
+	CELLSIZE uint8 = 16
+)
+
+const (
 	CLICKED             byte = 0
 	CLICKEDBOMB         byte = 128
 	CLICKEDEXPLOSION    byte = 204
