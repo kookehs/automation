@@ -6,9 +6,10 @@ import (
 )
 
 const (
-	OFFSETX  uint8 = 16
-	OFFSETY  uint8 = 102
-	CELLSIZE uint8 = 16
+	ADJACENTCELLS uint8 = 8
+	OFFSETX       uint8 = 16
+	OFFSETY       uint8 = 102
+	CELLSIZE      uint8 = 16
 )
 
 const (

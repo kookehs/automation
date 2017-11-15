@@ -4,10 +4,22 @@ import (
 	"math/rand"
 )
 
-func CellToCoordinates(cell int32, game *Game, process *Process) (int32, int32) {
-	x := process.Rect.Left + int32(OFFSETX) + cell%int32(game.Width)*int32(CELLSIZE)
-	y := process.Rect.Top + int32(OFFSETY) + cell/int32(game.Height)*int32(CELLSIZE)
-	return x, y
+func GetAdjacentCells() []int {
+	cells := []int{}
+
+	for i := 0; i < ADJACENTCELLS; i++ {
+
+	}
+}
+
+func SolveStraightforward() []int {
+	cells := []int{}
+
+	for i := 0; i < int(game.Width*game.Height); i++ {
+
+	}
+
+	return cells
 }
 
 func RandomClick(game *Game, process *Process) {
