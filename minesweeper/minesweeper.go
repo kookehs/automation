@@ -6,10 +6,9 @@ import (
 )
 
 const (
-	ADJACENTCELLS uint8 = 8
-	OFFSETX       uint8 = 16
-	OFFSETY       uint8 = 102
-	CELLSIZE      uint8 = 16
+	OFFSETX  uint8 = 16
+	OFFSETY  uint8 = 102
+	CELLSIZE uint8 = 16
 )
 
 const (
@@ -88,6 +87,33 @@ func NewGame(handle win.HANDLE) *Game {
 	game.Field = []byte{}
 	game.ReadFieldMemory(handle)
 	return game
+}
+
+func (game *Game) CellToCoordinates(cell uint8) (uint8, uint8) {
+	return cell % game.Width, cell / game.Height
+}
+
+func (game *Game) GetAdjacentCells(cell uint8) map[uint8][]uint8 {
+	cells := make(map[uint8][]uint8)
+	x, y := game.CellToCoordinates(cell)
+
+	for dx := -1; dx < 2; dx++ {
+		for dy := -1; dy < 2; dy++ {
+			if dx|dy == 0 {
+				continue
+			}
+
+			rx := x + uint8(dx)
+			ry := y + uint8(dy)
+
+			if rx >= 0 && rx < game.Width && ry >= 0 && ry < game.Height {
+				index := game.Width*ry + rx
+				cells[game.Field[index]] = append(cells[game.Field[index]], index)
+			}
+		}
+	}
+
+	return cells
 }
 
 func (game *Game) ReadFieldMemory(handle win.HANDLE) {

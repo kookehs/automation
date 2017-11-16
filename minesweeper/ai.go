@@ -1,19 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
 )
 
-func GetAdjacentCells() []int {
-	cells := []int{}
-
-	for i := 0; i < ADJACENTCELLS; i++ {
-
-	}
-}
-
-func SolveStraightforward() []int {
-	cells := []int{}
+func SolveStraightforward(game *Game) []uint8 {
+	cells := []uint8{}
 
 	for i := 0; i < int(game.Width*game.Height); i++ {
 
@@ -23,17 +16,19 @@ func SolveStraightforward() []int {
 }
 
 func RandomClick(game *Game, process *Process) {
-	hidden := []int{}
+	fmt.Println(game.GetAdjacentCells(0))
+
+	hidden := []uint8{}
 
 	for i := 0; i < int(game.Width*game.Height); i++ {
 		cell := game.Field[i]
 
 		if cell == HIDDEN || cell == HIDDENBOMB {
-			hidden = append(hidden, i)
+			hidden = append(hidden, uint8(i))
 		}
 	}
 
 	index := rand.Int31n(int32(len(hidden)))
-	x, y := CellToCoordinates(int32(hidden[index]), game, process)
+	x, y := CellToScreenCoordinates(hidden[index], game, process)
 	MouseClick(MOUSE_CLICKLEFT, x, y, 1)
 }

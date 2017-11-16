@@ -50,9 +50,9 @@ func NewProcess(pid win.DWORD) *Process {
 	return process
 }
 
-func CellToCoordinates(cell int32, game *Game, process *Process) (int32, int32) {
-	x := process.Rect.Left + int32(OFFSETX) + cell%int32(game.Width)*int32(CELLSIZE)
-	y := process.Rect.Top + int32(OFFSETY) + cell/int32(game.Height)*int32(CELLSIZE)
+func CellToScreenCoordinates(cell uint8, game *Game, process *Process) (int32, int32) {
+	x := process.Rect.Left + int32(OFFSETX+cell%game.Width*CELLSIZE)
+	y := process.Rect.Top + int32(OFFSETY+cell/game.Height*CELLSIZE)
 	return x, y
 }
 
