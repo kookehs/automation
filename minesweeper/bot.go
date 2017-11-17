@@ -56,29 +56,48 @@ func CellToScreenCoordinates(cell uint8, game *Game, process *Process) (int32, i
 	return x, y
 }
 
+func ExecuteCommands(commands map[byte][]uint8, game *Game, process *Process) {
+	for command, cells := range commands {
+		button := MOUSE_CLICKLEFT
+
+		if command == 'F' {
+			button = MOUSE_CLICKRIGHT
+		} else if command == 'M' {
+			button = MOUSE_CLICKMIDDLE
+		}
+
+		for _, cell := range cells {
+			x, y := CellToScreenCoordinates(cell, game, process)
+			MouseClick(button, x, y, 1)
+		}
+	}
+}
+
 func main() {
 	if len(os.Args) != 2 {
 		fmt.Println("Usage: bot.exe <pid>")
 		return
 	}
 
-	var minesweeper *Process
+	var process *Process
 
 	if pid, err := strconv.ParseUint(os.Args[1], 10, 32); err != nil {
 		fmt.Println(err)
 		return
 	} else {
-		minesweeper = NewProcess(win.DWORD(pid))
+		process = NewProcess(win.DWORD(pid))
 	}
 
-	defer win.CloseHandle(minesweeper.Handle)
-	fmt.Println(minesweeper)
+	defer win.CloseHandle(process.Handle)
+	fmt.Println(process)
 
-	game := NewGame(minesweeper.Handle)
+	game := NewGame(process.Handle)
 	fmt.Println(game)
 
 	rand.Seed(time.Now().UTC().UnixNano())
 
-	win.SetForegroundWindow(minesweeper.HWnd)
-	RandomClick(game, minesweeper)
+	win.SetForegroundWindow(process.HWnd)
+
+	// ExecuteCommands([]uint8{RandomCell(game)}, game, process)
+	ExecuteCommands(SolveStraightforward(game), game, process)
 }

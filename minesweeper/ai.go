@@ -1,23 +1,26 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
 )
 
-func SolveStraightforward(game *Game) []uint8 {
-	cells := []uint8{}
+func SolveStraightforward(game *Game) map[byte][]uint8 {
+	// TODO: Fix checking of adjacent cells to account for flags and question marks
+	commands := make(map[byte][]uint8)
 
 	for i := 0; i < int(game.Width*game.Height); i++ {
+		adjacent := game.GetAdjacentCells(uint8(i))
 
+		if CellByteToNumeric(game.Field[i]) == uint8(len(adjacent[HIDDEN])+len(adjacent[HIDDENBOMB])) {
+			commands['F'] = append(commands['F'], adjacent[HIDDEN]...)
+			commands['F'] = append(commands['F'], adjacent[HIDDENBOMB]...)
+		}
 	}
 
-	return cells
+	return commands
 }
 
-func RandomClick(game *Game, process *Process) {
-	fmt.Println(game.GetAdjacentCells(0))
-
+func RandomCell(game *Game) uint8 {
 	hidden := []uint8{}
 
 	for i := 0; i < int(game.Width*game.Height); i++ {
@@ -28,7 +31,5 @@ func RandomClick(game *Game, process *Process) {
 		}
 	}
 
-	index := rand.Int31n(int32(len(hidden)))
-	x, y := CellToScreenCoordinates(hidden[index], game, process)
-	MouseClick(MOUSE_CLICKLEFT, x, y, 1)
+	return hidden[rand.Int31n(int32(len(hidden)))]
 }

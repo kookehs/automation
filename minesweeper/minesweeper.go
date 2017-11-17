@@ -28,14 +28,14 @@ const (
 	REVEALEDFLAGNOBOMB   byte = 11
 	REVEALEDQUESTIONBOMB byte = 141
 
-	EIGHT byte = 8
-	FIVE  byte = 5
-	FOUR  byte = 4
-	ONE   byte = 1
-	SEVEN byte = 7
-	SIX   byte = 6
-	THREE byte = 3
-	TWO   byte = 2
+	EIGHT byte = 72
+	FIVE  byte = 69
+	FOUR  byte = 68
+	ONE   byte = 65
+	SEVEN byte = 71
+	SIX   byte = 70
+	THREE byte = 67
+	TWO   byte = 66
 )
 
 const (
@@ -126,4 +126,8 @@ func (game *Game) ReadFieldMemory(handle win.HANDLE) {
 		game.Field = append(game.Field, row...)
 		address += 0x20
 	}
+}
+
+func CellByteToNumeric(cell uint8) uint8 {
+	return cell - ONE + 1
 }
