@@ -19,14 +19,15 @@ const (
 
 	HIDDEN               byte = 15
 	HIDDENBOMB           byte = 143
+	HIDDENFLAGBOMB       byte = 142
 	HIDDENFLAGNOBOMB     byte = 14
+	HIDDENQUESTIONBOMB   byte = 141
 	HIDDENQUESTIONNOBOMB byte = 13
 
 	REVEALED             byte = 64
 	REVEALEDBOMB         byte = 138
-	REVEALEDFLAGBOMB     byte = 142
 	REVEALEDFLAGNOBOMB   byte = 11
-	REVEALEDQUESTIONBOMB byte = 141
+	REVEALEDQUESTIONBOMB byte = 138
 
 	EIGHT byte = 72
 	FIVE  byte = 69
@@ -129,5 +130,11 @@ func (game *Game) ReadFieldMemory(handle win.HANDLE) {
 }
 
 func CellByteToNumeric(cell uint8) uint8 {
-	return cell - ONE + 1
+	number := cell - ONE + 1
+
+	if number < 1 && number > 8 {
+		number = 0
+	}
+
+	return number
 }

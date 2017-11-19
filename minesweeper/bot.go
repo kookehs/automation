@@ -56,20 +56,18 @@ func CellToScreenCoordinates(cell uint8, game *Game, process *Process) (int32, i
 	return x, y
 }
 
-func ExecuteCommands(commands map[byte][]uint8, game *Game, process *Process) {
-	for command, cells := range commands {
+func ExecuteCommands(commands map[uint8]byte, game *Game, process *Process) {
+	for cell, command := range commands {
 		button := MOUSE_CLICKLEFT
 
-		if command == 'F' {
+		if command == 'R' {
 			button = MOUSE_CLICKRIGHT
 		} else if command == 'M' {
 			button = MOUSE_CLICKMIDDLE
 		}
 
-		for _, cell := range cells {
-			x, y := CellToScreenCoordinates(cell, game, process)
-			MouseClick(button, x, y, 1)
-		}
+		x, y := CellToScreenCoordinates(cell, game, process)
+		MouseClick(button, x, y, 1)
 	}
 }
 
