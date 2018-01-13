@@ -94,6 +94,10 @@ func (game *Game) CellToCoordinates(cell uint8) (uint8, uint8) {
 	return cell % game.Width, cell / game.Height
 }
 
+func (game *Game) CoordinatesToCell(x, y uint8) uint8 {
+	return game.Width*y + x
+}
+
 func (game *Game) GetAdjacentCells(cell uint8) map[uint8][]uint8 {
 	cells := make(map[uint8][]uint8)
 	x, y := game.CellToCoordinates(cell)

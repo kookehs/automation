@@ -2,7 +2,33 @@ package main
 
 import (
 	"math/rand"
+	"sort"
 )
+
+func BreadthFirstSearch(game *Game) map[uint8]byte {
+	commands := make(map[uint8]byte)
+	queue := make([]uint8, 0)
+	visited := make([]uint8, 0)
+	src := game.CoordinatesToCell(game.X, game.Y)
+	queue = append(queue, src)
+
+	for len(queue) > 0 {
+		parent, queue := queue[0], queue[1:]
+
+		for _, cells := range game.GetAdjacentCells(parent) {
+			for _, child := range cells {
+				set := sort.IntSlice(visited)
+				set.Sort()
+
+				if sort.SearchInts(set, child) != len(visited) {
+
+				}
+			}
+		}
+	}
+
+	return commands
+}
 
 func SolveStraightforward(game *Game) map[uint8]byte {
 	commands := make(map[uint8]byte)
