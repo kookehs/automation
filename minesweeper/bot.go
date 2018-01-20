@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/kookehs/automation/api/win"
+	"github.com/kookehs/exp/api/win"
 	"math/rand"
 	"os"
 	"strconv"

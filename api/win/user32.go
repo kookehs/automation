@@ -149,7 +149,7 @@ func init() {
 }
 
 func CreateWindowEx(dwExStyle DWORD, lpClassName, lpWindowName LPCTSTR, dwStyle DWORD, x, y, nWidth, nHeight int, hWndParent HWND, hMenu HMENU, hInstance HINSTANCE, lpParam LPVOID) HWND {
-	ret, _, _ := createWindowEx.Call(dwExStyle, lpClassName, lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, hMenu, hInstance, lpParam)
+	ret, _, _ := createWindowEx.Call(uintptr(dwExStyle), uintptr(unsafe.Pointer(&(*lpClassName)[0])), uintptr(unsafe.Pointer(&(*lpWindowName)[0])), uintptr(dwStyle), uintptr(x), uintptr(y), uintptr(nWidth), uintptr(nHeight), hWndParent, hMenu, hInstance, uintptr(lpParam))
 	return ret
 }
 

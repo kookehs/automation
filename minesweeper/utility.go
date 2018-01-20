@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/kookehs/automation/api/win"
+	"github.com/kookehs/exp/api/win"
 	"unsafe"
 )
 

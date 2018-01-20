@@ -35,17 +35,21 @@ const (
 )
 
 type (
+	ATOM      = WORD
 	BOOL      = int
 	DWORD     = uint32
 	HANDLE    = uintptr
 	HINSTANCE = HANDLE
+	HMENU     = HANDLE
 	HMODULE   = HINSTANCE
 	LONG      = int32
 	LONG_PTR  = int64
 	LPARAM    = LONG_PTR
-	LPVOID    = unsafe.Pointer
+	LPCTSTR   = LPCWSTR
 	LPCVOID   = unsafe.Pointer
+	LPCWSTR   = *WCHAR
 	LPDWORD   = *DWORD
+	LPVOID    = unsafe.Pointer
 	LPTSTR    = LPWSTR
 	LPWSTR    = *WCHAR
 	LRESULT   = LONG_PTR
